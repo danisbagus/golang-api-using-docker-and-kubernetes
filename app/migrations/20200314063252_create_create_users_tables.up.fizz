@@ -1,0 +1,10 @@
+create_table("users") {
+    t.Column ("id", "integer", {primary: true})
+    t.Column("full_name","string",{"size": 100})
+    t.Column("email","string",{"size": 50})
+    t.Column("password","string",{"size": 100})
+    t.Column("hash","string",{"size": 255})
+    t.Column("created_at", "timestamp", {"null": true})
+    t.Columncannot import env within yaml file("updated_at", "timestamp", {"null": true})
+    t.Column("deleted_at", "timestamp", {"null": true})
+}

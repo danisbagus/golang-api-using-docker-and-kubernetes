@@ -1,0 +1,16 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: go-api-configmap
+  namespace: default
+  labels:
+    app: go-api-configmap
+    name: go-api-configmap
+data:
+  .env: |
+    PORT=3000
+    DB_HOST=mysql
+    DB_PORT=3306
+    DB_NAME=db_golang
+    DB_USER=root
+    DB_PASSWORD=root

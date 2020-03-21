@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-api
+  template:
+    metadata:
+      labels:
+        app: go-api
+    spec:
+      containers:
+        - name: go-api
+          image: docker.io/danisbagus/go-api
+          envFrom:
+            - configMapRef:
+                name: go-api-configmap
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: go-api-volume
+              mountPath: /go/.env
+              subPath: .env
+      imagePullSecrets:
+        - name: regcred
+      volumes:
+        - name: go-api-volume
+          configMap:
+            name: go-api-configmap
