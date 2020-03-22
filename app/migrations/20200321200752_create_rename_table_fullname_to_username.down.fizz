@@ -1,0 +1,1 @@
+rename_column("users", "username", "full_name")

@@ -1,0 +1,1 @@
+add_column("users", "hash", "string", {"size": 255, "after":"group"})

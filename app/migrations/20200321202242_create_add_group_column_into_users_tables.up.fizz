@@ -1,0 +1,1 @@
+add_column("users", "group", "string", {"size": 100, "after":"password"})
