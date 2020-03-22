@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"time"
 	"go-project/config"
 	"go-project/models"
 
@@ -37,30 +38,54 @@ type Credential struct {
 
 func Login(c *gin.Context){
 
-	user := new(Credential)
-	err := c.Bind(user)
+	data := new(Credential)
+	err := c.Bind(data)
+
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status":  http.StatusBadRequest,
 			"message": "can't bind struct",
 		})
+		c.Abort() 
 	}
+
+	db, err:= config.DBInit()
+	_user := models.Users{}
+
+	if err != nil {
+		c.JSON(404,err)
+	}
+
+	if err := db.Where("username = ?", data.Username).First(&_user).Error; err != nil {
+		c.AbortWithStatus(404)
+		fmt.Println(err)
+	}
+
+	 defer db.Close()
 	 
-	if user.Username != "danisbagus" {
+	if data.Username != _user.Username {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  http.StatusUnauthorized,
 			"message": "wrong username or password",
 		})
+		c.Abort() 
+
 	} else {
-		if user.Password != "12345" {
+		if data.Password != _user.Password {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"status":  http.StatusUnauthorized,
 				"message": "wrong username or password",
 			})
+			c.Abort() 
 		}
 	}
 
-	sign := jwt.New(jwt.GetSigningMethod("HS256"))
+	claims := jwt.MapClaims{}
+	claims["authorized"] = true
+	claims["user_id"] = _user.ID
+	claims["exp"] = time.Now().Add(time.Hour * 1).Unix() //Token expires after 1 hour
+	sign := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	// token, err := sign.SignedString([]byte(os.Getenv("API_SECRET")))
 	token, err := sign.SignedString([]byte("secret"))
 
 	if err != nil {
